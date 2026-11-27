@@ -3,14 +3,12 @@ set -euo pipefail
 
 remote=https://github.com/A1booooo/a1booooo.com.git
 releases=/www/wwwroot/mysite-releases
-repository=/var/lib/mysite-deploy/artifacts.git
+archive_base=https://codeload.github.com/A1booooo/a1booooo.com/tar.gz
 current="$releases/current"
 
-if [[ ! -d "$repository" ]]; then
-    git init --quiet --bare "$repository"
-fi
-timeout 45s git -C "$repository" fetch --quiet --no-tags --depth=1 "$remote" refs/heads/mysite-production
-publication="$(git -C "$repository" rev-parse --verify FETCH_HEAD^{commit})"
+published_ref="$(timeout 20s git ls-remote --exit-code "$remote" refs/heads/mysite-production)"
+publication="${published_ref%%$'\t'*}"
+[[ "$publication" =~ ^[0-9a-f]{40}$ ]]
 old_release="$(readlink "$current")"
 if [[ "$old_release" == "$publication" ]]; then
     exit 0
@@ -22,7 +20,9 @@ release="$releases/$publication"
 if [[ ! -d "$release" ]]; then
     candidate="$workspace/release"
     mkdir "$candidate"
-    git -C "$repository" archive "$publication" | tar -x -C "$candidate" --no-same-permissions
+    curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+        --connect-timeout 12 --max-time 150 -o "$workspace/site.tar.gz" "$archive_base/$publication"
+    tar -xzf "$workspace/site.tar.gz" -C "$candidate" --strip-components=1 --no-same-permissions
     if [[ -n "$(find "$candidate" -type l -print -quit)" ]]; then
         echo 'Build contains a symbolic link.' >&2
         exit 1
