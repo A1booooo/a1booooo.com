@@ -1,0 +1,66 @@
+name: Deploy mysite
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mysite-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Publish the build to mysite-production
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          remote="https://github.com/$GITHUB_REPOSITORY.git"
+          main_ref="$(git ls-remote --exit-code "$remote" refs/heads/main)"
+          if [[ "${main_ref%%$'\t'*}" != "$GITHUB_SHA" ]]; then
+            echo 'A newer push to main superseded this build.'
+            exit 0
+          fi
+
+          publication="$(mktemp -d "$RUNNER_TEMP/mysite-production.XXXXXX")"
+          cp -a dist/. "$publication/"
+          printf '%s\n' "$GITHUB_SHA" > "$publication/revision.txt"
+          cd "$publication"
+
+          git init --quiet --initial-branch=mysite-production
+          git remote add origin "$remote"
+          if git ls-remote --exit-code origin refs/heads/mysite-production >/dev/null; then
+            git fetch --no-tags --depth=1 origin refs/heads/mysite-production
+            git reset --mixed FETCH_HEAD
+          else
+            status=$?
+            if [[ "$status" -ne 2 ]]; then exit "$status"; fi
+          fi
+
+          git add --force --all
+          if git diff --cached --quiet; then
+            echo 'This build has already been published.'
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -m "Deploy $GITHUB_SHA"
+          git push origin HEAD:refs/heads/mysite-production
