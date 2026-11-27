@@ -28,8 +28,8 @@ export default function App() {
     document.querySelector('meta[name="description"]')?.setAttribute('content', profile.meta.description)
     console.log(
       `%c${profile.ui.stamp} ${profile.ui.brand}%c\n${profile.ui.consoleGreeting}${profile.contact.email}`,
-      'font: 700 14px monospace; color: #fff; background: #e0452b; padding: 4px 8px;',
-      'font: 12px sans-serif; color: #4d4741;',
+      'font: 700 14px monospace; color: #fff; background: #ff2d55; padding: 4px 8px;',
+      'font: 12px sans-serif; color: #c2b5bd;',
     )
   }, [])
 

@@ -134,7 +134,7 @@ export const profile: Profile = {
     konami: '超能力暴走！……抱歉，马上放回去。',
     footer: [
       '© 2026 陈玥青 · a1booooo.com · Made with React, pixels & ☕',
-      '「相棒」是致敬《齐木楠雄的灾难》的原创像素画，原作 © 麻生周一 / 集英社',
+      '「相棒」像素形象转写自一张拼豆图纸，致敬《齐木楠雄的灾难》，原作 © 麻生周一 / 集英社',
       '字体：缝合像素 Fusion Pixel、站酷快乐体（OFL）· 图标：pixelarticons（MIT）',
     ],
     consoleGreeting: '你好，同行！你在读这个网站的心声。想聊聊的话，欢迎来信：',
@@ -805,7 +805,7 @@ export const profile: Profile = {
       version: 'v3.0',
       kind: '改版',
       title: '网站改版：心灵感应模式上线',
-      text: '从通用的像素 RPG 面板，改成黑白网点 + 朱红的漫画风；新增内心 OS、齐木风相棒和咖啡果冻彩蛋。',
+      text: '从通用的像素 RPG 面板，改成深色霓虹 + 玫红发光的风格；新增内心 OS、拼豆相棒和咖啡果冻彩蛋。',
     },
     {
       date: '2026-11-27',

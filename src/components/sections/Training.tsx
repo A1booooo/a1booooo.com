@@ -8,15 +8,14 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { burst } from '../fx/particles'
 import { Icon } from '../ui/Icon'
 import { OsBubble } from '../ui/OsBubble'
-import { Panel } from '../ui/Panel'
 
 const { training, ui } = profile
-const SPARKS = ['#e0452b', '#1c1917', '#f4b6a6']
+const SPARKS = ['#ff2d55', '#ff6f8c', '#ffb3c3', '#ffffff']
 
 /** 修炼中的技能（第 2 话下半） */
 export function TrainingList() {
   return (
-    <ul className="grid items-start gap-8 md:grid-cols-2">
+    <ul className="grid items-start gap-5 md:grid-cols-2">
       {training.map((t, i) => (
         <TrainingCard key={t.id} t={t} index={i} />
       ))}
@@ -60,21 +59,21 @@ function TrainingCard({ t, index }: { t: TrainingSkill; index: number }) {
       viewport={{ once: true, margin: '0px 0px -8% 0px' }}
       transition={{ type: 'spring', stiffness: 150, damping: 20, delay: (index % 2) * 0.07 }}
     >
-      <Panel tone="red" className="flex flex-col">
-        <div className="charge-stripes h-2 border-b-[2.5px] border-ink bg-red" aria-hidden="true" />
+      <div className="card card-hover flex flex-col overflow-hidden">
+        <div className="charge-stripes h-1.5 bg-gradient-to-r from-neon via-[#ff5e7e] to-[#ff9a8b] shadow-[0_0_12px_rgb(255_45_85/0.8)]" aria-hidden="true" />
         <div className="flex flex-1 flex-col gap-4 p-5">
           <div className="flex items-start gap-3">
-            <span className="grid size-11 shrink-0 place-items-center border-[2.5px] border-ink bg-red-soft text-red-strong">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-neon-dim text-neon-hi">
               <Icon name={t.icon} size={24} />
             </span>
             <div className="min-w-0 flex-1">
-              <h3 className="font-semibold leading-snug">{t.name}</h3>
-              <p className="mt-0.5 font-mono text-xs text-ink-faint">
+              <h3 className="font-semibold leading-snug text-fg">{t.name}</h3>
+              <p className="mt-0.5 font-mono text-xs text-fg-faint">
                 {ui.training.startedLabel} {t.startedAt}
               </p>
             </div>
-            <span className="flex items-center gap-1.5 border-[1.5px] border-red px-2 py-1 font-pixel text-[12px] leading-none text-red-strong">
-              <span className="size-1.5 animate-pulse-soft bg-red" />
+            <span className="neon-outline flex items-center gap-1.5 rounded-full px-2 py-1 font-pixel text-[12px] leading-none text-neon-pale">
+              <span className="size-1.5 animate-pulse-soft rounded-full bg-neon" />
               {ui.training.badge}
             </span>
           </div>
@@ -89,7 +88,7 @@ function TrainingCard({ t, index }: { t: TrainingSkill; index: number }) {
                   animate={{ opacity: 1, y: -30, scale: 1 }}
                   exit={{ opacity: 0, y: -44 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-                  className="pointer-events-none absolute -top-2 font-tiny text-[13px] text-red"
+                  className="glow-text pointer-events-none absolute -top-2 font-tiny text-[13px]"
                   style={{ left: `calc(${value}% - 18px)` }}
                 >
                   {ui.training.expPopup}
@@ -100,15 +99,15 @@ function TrainingCard({ t, index }: { t: TrainingSkill; index: number }) {
 
           <div className="space-y-2.5 text-sm">
             <p>
-              <span className="mr-2 font-pixel text-[12px] text-ink-faint">{ui.training.stageLabel}</span>
-              <span className="leading-6 text-ink">{t.stage}</span>
+              <span className="mr-2 font-pixel text-[12px] text-fg-faint">{ui.training.stageLabel}</span>
+              <span className="leading-6 text-fg">{t.stage}</span>
             </p>
-            <p className="tone-red flex gap-2 border-[1.5px] border-ink bg-card px-3 py-2 leading-6 text-ink">
-              <span className="mt-0.5 shrink-0 text-red-strong">
+            <p className="flex gap-2 rounded-xl bg-neon-dim px-3 py-2 leading-6 text-fg">
+              <span className="mt-0.5 shrink-0 text-neon-hi">
                 <Icon name="flag" size={16} />
               </span>
-              <span className="bg-card/85">
-                <span className="font-semibold text-red-strong">{ui.training.nextLabel}：</span>
+              <span>
+                <span className="font-semibold text-neon-pale">{ui.training.nextLabel}：</span>
                 {t.nextMilestone}
               </span>
             </p>
@@ -123,24 +122,24 @@ function TrainingCard({ t, index }: { t: TrainingSkill; index: number }) {
                 transition={{ type: 'spring', stiffness: 260, damping: 30 }}
                 className="overflow-hidden"
               >
-                <div className="space-y-4 border-t-[2px] border-dashed border-ink/30 pt-4 text-sm">
+                <div className="space-y-4 border-t border-dashed border-line pt-4 text-sm">
                   <div>
-                    <p className="mb-1 font-pixel text-[12px] text-ink-faint">{ui.training.whyLabel}</p>
-                    <p className="leading-6 text-ink-soft">{t.why}</p>
+                    <p className="mb-1 font-pixel text-[12px] text-fg-faint">{ui.training.whyLabel}</p>
+                    <p className="leading-6 text-fg-soft">{t.why}</p>
                   </div>
                   <div>
-                    <p className="mb-1.5 font-pixel text-[12px] text-ink-faint">{ui.training.logLabel}</p>
+                    <p className="mb-1.5 font-pixel text-[12px] text-fg-faint">{ui.training.logLabel}</p>
                     <ul className="space-y-1.5">
                       {t.log.map((l, i) => (
                         <li key={i} className="flex gap-3 leading-6">
-                          <span className="shrink-0 font-mono text-xs leading-6 text-red-strong">{l.date}</span>
-                          <span className="text-ink-soft">{l.text}</span>
+                          <span className="shrink-0 font-mono text-xs leading-6 text-neon-hi">{l.date}</span>
+                          <span className="text-fg-soft">{l.text}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <p className="mb-1.5 font-pixel text-[12px] text-ink-faint">{ui.training.resourcesLabel}</p>
+                    <p className="mb-1.5 font-pixel text-[12px] text-fg-faint">{ui.training.resourcesLabel}</p>
                     <ul className="flex flex-wrap gap-2">
                       {t.resources.map((r) => (
                         <li key={r.label}>
@@ -148,7 +147,7 @@ function TrainingCard({ t, index }: { t: TrainingSkill; index: number }) {
                             href={r.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1 border-[1.5px] border-ink bg-card px-2.5 py-1 font-mono text-xs text-ink-soft transition-colors hover:bg-ink hover:text-white"
+                            className="inline-flex items-center gap-1 rounded-full border border-line px-2.5 py-1 font-mono text-xs text-fg-soft transition-colors hover:border-neon/70 hover:text-neon-pale"
                           >
                             {r.label}
                             <Icon name="external" size={12} />
@@ -167,7 +166,7 @@ function TrainingCard({ t, index }: { t: TrainingSkill; index: number }) {
               type="button"
               onClick={() => setOpen((o) => !o)}
               aria-expanded={open}
-              className="font-mono text-xs text-ink-soft underline-offset-4 hover:text-ink hover:underline"
+              className="font-mono text-xs text-fg-soft underline-offset-4 hover:text-fg hover:underline"
             >
               {open ? ui.training.collapse : ui.training.expand} {open ? '▲' : '▼'}
             </button>
@@ -175,20 +174,21 @@ function TrainingCard({ t, index }: { t: TrainingSkill; index: number }) {
               type="button"
               onClick={charge}
               whileTap={{ scale: 0.92 }}
-              className="flex items-center gap-1.5 border-[2.5px] border-ink bg-red px-3 py-1.5 text-xs font-semibold text-white shadow-[3px_3px_0_var(--color-ink)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_var(--color-ink)]"
+              whileHover={{ y: -2 }}
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-neon to-[#ff7a7a] px-3 py-1.5 text-xs font-semibold text-white shadow-[0_0_16px_-2px_rgb(255_45_85/0.8)]"
             >
               <Icon name="zap" size={14} />
               {ui.training.charge}
             </motion.button>
           </div>
         </div>
-      </Panel>
-      <OsBubble text={t.os} className="mt-2" />
+      </div>
+      <OsBubble text={t.os} className="px-1" />
     </motion.li>
   )
 }
 
-/** 修炼进度条：朱红 + 流动斜纹 + 数字滚动 */
+/** 修炼进度条：霓虹渐变 + 流动斜纹 + 前沿呼吸块 + 数字滚动 */
 function ChargeBar({ value, ref }: { value: number; ref: React.Ref<HTMLDivElement> }) {
   const wrap = useRef<HTMLDivElement>(null)
   const fill = useRef<HTMLDivElement>(null)
@@ -222,20 +222,28 @@ function ChargeBar({ value, ref }: { value: number; ref: React.Ref<HTMLDivElemen
   return (
     <div ref={wrap}>
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="font-tiny text-[11px] text-ink-faint">EXP</span>
-        <span ref={num} className="font-tiny text-[13px] text-red-strong">
+        <span className="font-tiny text-[11px] text-fg-faint">EXP</span>
+        <span ref={num} className="glow-text font-tiny text-[13px]">
           0%
         </span>
       </div>
-      <div ref={ref} className="relative h-4 border-[2.5px] border-ink bg-card">
-        <div ref={fill} className="relative h-full bg-red" style={{ width: 0 }}>
-          <div className="charge-stripes absolute inset-0" />
-          <span className="absolute top-0 right-0 h-full w-1 animate-pulse-soft bg-white/90" />
+      <div ref={ref} className="relative h-4 rounded-[4px] bg-neon-dim p-[3px] ring-1 ring-neon/40">
+        <div className="relative h-full overflow-hidden rounded-[2px]">
+          <div
+            ref={fill}
+            className="relative h-full bg-gradient-to-r from-neon via-[#ff5e7e] to-[#ff9a8b] shadow-[0_0_10px_rgb(255_45_85/0.9)]"
+            style={{ width: 0 }}
+          >
+            <div className="charge-stripes absolute inset-0" />
+            {/* 前沿呼吸块 */}
+            <span className="absolute top-0 right-0 h-full w-1.5 animate-pulse-soft bg-white/85" />
+          </div>
+          {/* 分段缝隙，形成像素格 */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent 0 calc(5% - 2px), var(--color-surface) calc(5% - 2px) 5%)' }}
+          />
         </div>
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent 0 calc(5% - 2px), #fff calc(5% - 2px) 5%)' }}
-        />
       </div>
     </div>
   )

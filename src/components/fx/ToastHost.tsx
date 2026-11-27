@@ -26,7 +26,7 @@ export function ToastHost() {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 8, opacity: 0, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-            className="pixel-notch bg-ink px-4 py-2.5 font-mono text-sm text-white"
+            className="neon-outline rounded-xl bg-surface/95 px-4 py-2.5 font-mono text-sm text-fg backdrop-blur-sm"
           >
             {msg.text}
           </motion.div>

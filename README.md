@@ -1,6 +1,6 @@
 # a1booooo.com · 陈玥青的个人网站
 
-黑白网点 + 朱红的漫画风个人站。打开右上角的「心灵感应」开关，可以读到我的内心 OS。
+深色霓虹 + 玫红发光的像素风个人站。打开右上角的「心灵感应」开关，可以读到我的内心 OS。
 
 ```bash
 npm install
@@ -30,8 +30,9 @@ npm run fonts
 
 ## 相棒
 
-封面上的像素小人「相棒」由 `scripts/draw-aibo.py` 生成（`python3 scripts/draw-aibo.py --preview out.png` 可导出预览图，需要 Pillow）。
-它是致敬《齐木楠雄的灾难》的原创像素画，原作 © 麻生周一 / 集英社。
+封面上的像素小人「相棒」转写自一张 35×35 的拼豆图纸，各个表情帧由 `scripts/aibo-from-beads.py` 生成
+（`python3 scripts/aibo-from-beads.py --preview out.png` 可导出预览图，需要 Pillow）。
+致敬《齐木楠雄的灾难》，原作 © 麻生周一 / 集英社。
 
 彩蛋：连点相棒 5 次；在页面上按 ↑↑↓↓←→←→BA。
 

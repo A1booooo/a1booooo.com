@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { burst } from './particles'
 
-const COLORS = ['#e0452b', '#f4b6a6', '#1c1917']
+const COLORS = ['#ff2d55', '#ff6f8c', '#ffb3c3']
 
 /** 极淡的像素光点拖尾（仅精细指针设备） */
 export function CursorSparkle() {

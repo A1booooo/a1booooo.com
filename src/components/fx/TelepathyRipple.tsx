@@ -8,9 +8,9 @@ export function TelepathyRipple() {
   const reduced = usePrefersReducedMotion()
   if (reduced) return null
   const reach = Math.hypot(window.innerWidth, window.innerHeight) * 1.1
-  const color = ripple?.on ? 'var(--color-red)' : 'var(--color-ink)'
+  const color = ripple?.on ? 'var(--color-neon)' : 'rgb(255 255 255 / 0.6)'
   return (
-    <svg className="no-print pointer-events-none fixed inset-0 z-[80] h-full w-full" aria-hidden="true">
+    <svg className="no-print pointer-events-none fixed inset-0 z-[80] h-full w-full drop-shadow-[0_0_6px_rgb(255_45_85/0.9)]" aria-hidden="true">
       <AnimatePresence>
         {ripple &&
           [0, 1, 2].map((i) => (

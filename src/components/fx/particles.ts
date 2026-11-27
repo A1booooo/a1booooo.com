@@ -30,7 +30,7 @@ export function onBurst(l: Listener) {
   }
 }
 
-export const PARTY_COLORS = ['#e0452b', '#1c1917', '#f4b6a6', '#b8321c', '#ffffff']
+export const PARTY_COLORS = ['#ff2d55', '#ff6f8c', '#ffb3c3', '#ffffff', '#9bf467']
 
 /** 在元素中心爆发 */
 export function burstAt(el: Element, o: Partial<BurstOptions> = {}) {

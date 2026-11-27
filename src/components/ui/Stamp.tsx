@@ -9,17 +9,18 @@ export function Stamp({ size = 64, className = '' }: { size?: number; className?
     <span
       role="img"
       aria-label={profile.ui.stamp}
-      className={`inline-grid shrink-0 bg-red text-white ${className}`}
-      style={{ width: size, height: size, clipPath: notch, padding: size * 0.09 }}
+      className={`inline-block shrink-0 drop-shadow-[0_0_10px_rgb(255_45_85/0.7)] ${className}`}
     >
-      <span
-        className="grid grid-cols-2 grid-rows-2 place-items-center border-white font-pixel leading-none"
-        style={{ borderWidth: Math.max(1.5, size / 32), fontSize: 12 * Math.max(1, Math.round((size * 0.34) / 12)) }}
-      >
-        <span>{c}</span>
-        <span>{a}</span>
-        <span>{d}</span>
-        <span>{b}</span>
+      <span className="grid bg-neon text-white" style={{ width: size, height: size, clipPath: notch, padding: size * 0.09 }}>
+        <span
+          className="grid grid-cols-2 grid-rows-2 place-items-center border-white font-pixel leading-none"
+          style={{ borderWidth: Math.max(1.5, size / 32), fontSize: 12 * Math.max(1, Math.round((size * 0.34) / 12)) }}
+        >
+          <span>{c}</span>
+          <span>{a}</span>
+          <span>{d}</span>
+          <span>{b}</span>
+        </span>
       </span>
     </span>
   )
