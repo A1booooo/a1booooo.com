@@ -235,6 +235,8 @@ export interface UiCopy {
   }
   skills: {
     advanceTitle: string
+    /** 技能栏图例：亮度代表熟练度 */
+    legend: string
     allLabel: string
     levelPrefix: string
     highlightsLabel: string

@@ -46,7 +46,7 @@ export const profile: Profile = {
       skills: {
         chapter: '第 2 话',
         title: '技能与修炼',
-        desc: '等级按简历措辞如实评定，不注水。点开任意技能，看它在哪里真正用过。',
+        desc: '等级按简历措辞如实评定，不注水。点任意技能，看它在哪里真正用过。',
       },
       works: { chapter: '第 3 话', title: '作品', desc: '从零开始，自己一个人做出来的东西。' },
       quests: { chapter: '第 4 话', title: '冒险履历', desc: '实习经历、教育背景与荣誉。简历也放在这里。' },
@@ -74,6 +74,7 @@ export const profile: Profile = {
     },
     skills: {
       advanceTitle: '转职进度',
+      legend: '越亮越熟练 · 点一下看详情',
       allLabel: '全部',
       levelPrefix: 'Lv.',
       highlightsLabel: '实战说明',

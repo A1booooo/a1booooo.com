@@ -1,7 +1,8 @@
-import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
-import { useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useState } from 'react'
 import { profile } from '../../data/profile'
 import type { Skill } from '../../data/types'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { burst } from '../fx/particles'
 import { Icon } from '../ui/Icon'
 import { OsBubble } from '../ui/OsBubble'
@@ -12,100 +13,122 @@ import { Tag } from '../ui/Tag'
 import { TrainingList } from './Training'
 
 const { skillCategories, character, ui } = profile
-const ALL = '__all__'
 
 type Entry = Skill & { category: string }
 const entries: Entry[] = skillCategories.flatMap((c) => c.skills.map((s) => ({ ...s, category: c.id })))
 
-/** 第 2 话 · 技能与修炼 */
-export function Skills() {
-  const [filter, setFilter] = useState(ALL)
-  const [open, setOpen] = useState<string | null>(null)
-  const visible = useMemo(() => (filter === ALL ? entries : entries.filter((e) => e.category === filter)), [filter])
+/** 熟练度越高越亮：Lv.7 实心发光 / Lv.6 霓虹描边 / Lv.5 暗红底 / 更低是灰色 */
+function tier(level: number) {
+  if (level >= 7) return 'bg-neon text-white shadow-[0_0_14px_-2px_rgb(255_45_85/0.85)]'
+  if (level === 6) return 'neon-outline text-neon-pale'
+  if (level === 5) return 'border border-neon/25 bg-neon-dim text-neon-hi'
+  return 'border border-line bg-white/[0.05] text-fg-soft'
+}
 
-  const toggle = (id: string, el: HTMLElement) => {
-    const next = open === id ? null : id
-    setOpen(next)
-    if (next) {
-      const r = el.getBoundingClientRect()
-      burst({ x: r.left + 30, y: r.top + 30, count: 10, speed: 2.6, size: 4 })
-    }
+/** 第 2 话 · 技能与修炼：技能栏 + 一个详情面板 */
+export function Skills() {
+  const [selected, setSelected] = useState(entries[0].id)
+  const wide = useMediaQuery('(min-width: 1024px)')
+  const current = entries.find((e) => e.id === selected) ?? entries[0]
+
+  const pick = (id: string, el: HTMLElement) => {
+    setSelected(id)
+    const r = el.getBoundingClientRect()
+    burst({ x: r.left + r.width / 2, y: r.top + r.height / 2, count: 10, speed: 2.6, size: 4 })
   }
 
   return (
     <section id="skills" className="mx-auto max-w-6xl px-5 py-24">
       <SectionHeader copy={ui.sections.skills} />
 
-      <Reveal className="mb-14">
+      <Reveal className="mb-16">
         <Advance />
       </Reveal>
 
-      {/* 分类筛选 */}
-      <div className="mb-6 flex flex-wrap gap-2" role="tablist">
-        <FilterChip active={filter === ALL} onClick={() => setFilter(ALL)} label={ui.skills.allLabel} count={entries.length} />
-        {skillCategories.map((c) => (
-          <FilterChip key={c.id} active={filter === c.id} onClick={() => setFilter(c.id)} label={c.label} count={c.skills.length} icon={c.icon} />
-        ))}
-      </div>
-
-      <LayoutGroup>
-        <motion.ul layout className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {visible.map((s) => {
-              const isOpen = open === s.id
-              return (
-                <motion.li
-                  layout
-                  key={s.id}
-                  initial={{ opacity: 0, scale: 0.94 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.94 }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                >
-                  <div className={`card card-hover overflow-hidden ${isOpen ? 'glow-box' : ''}`}>
-                    <button type="button" onClick={(ev) => toggle(s.id, ev.currentTarget)} aria-expanded={isOpen} className="group w-full p-4 text-left">
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`grid size-10 shrink-0 place-items-center rounded-xl transition-colors ${
-                            isOpen ? 'bg-neon text-white shadow-[0_0_14px_rgb(255_45_85/0.7)]' : 'bg-neon-dim text-neon-hi'
-                          }`}
-                        >
-                          <Icon name={s.icon} size={22} />
+      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        {/* 技能栏：按分类分行 */}
+        <div>
+          <p className="mb-6 flex items-center gap-2 font-pixel text-[12px] leading-none text-fg-faint">
+            <span className="flex gap-1" aria-hidden="true">
+              <span className="size-2.5 rounded-[2px] bg-white/10" />
+              <span className="size-2.5 rounded-[2px] bg-neon-dim" />
+              <span className="size-2.5 rounded-[2px] border border-neon" />
+              <span className="size-2.5 rounded-[2px] bg-neon shadow-[0_0_6px_#ff2d55]" />
+            </span>
+            {ui.skills.legend}
+          </p>
+          <div className="space-y-7">
+            {skillCategories.map((c, ci) => (
+              <Reveal key={c.id} delay={ci * 0.04}>
+                <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-fg-soft">
+                  <Icon name={c.icon} size={16} className="text-neon-hi" />
+                  {c.label}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {c.skills.map((s) => {
+                    const on = s.id === selected
+                    return (
+                      <motion.button
+                        key={s.id}
+                        type="button"
+                        onClick={(ev) => pick(s.id, ev.currentTarget)}
+                        aria-pressed={on}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`flex items-center gap-1.5 rounded-xl py-1.5 pr-2.5 pl-2 text-sm font-medium transition-[outline-color] ${tier(s.level)} ${
+                          on ? 'outline-2 outline-offset-2 outline-white' : 'outline-2 outline-offset-2 outline-transparent'
+                        }`}
+                      >
+                        <Icon name={s.icon} size={16} />
+                        {s.name}
+                        <span className="font-tiny text-[10px] opacity-75">
+                          {ui.skills.levelPrefix}
+                          {s.level}
                         </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold leading-snug text-fg">{s.name}</p>
-                          <p className="font-mono text-xs text-fg-faint">
-                            <span className="font-tiny text-[11px] text-neon-hi">
-                              {ui.skills.levelPrefix}
-                              {s.level}
-                            </span>{' '}
-                            · {s.rank}
-                          </p>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+                {/* 手机：详情直接在当前分类下面展开 */}
+                {!wide && (
+                  <AnimatePresence initial={false}>
+                    {current.category === c.id && (
+                      <motion.div
+                        key={current.id}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pt-4">
+                          <SkillCard skill={current} />
                         </div>
-                        <span className={`text-[10px] text-fg-faint transition-transform ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true">
-                          ▼
-                        </span>
-                      </div>
-                      <div className="mt-3.5">
-                        <SegmentBar value={s.level} size="sm" dim={!isOpen} />
-                      </div>
-                      <p className="mt-3 text-sm leading-6 text-fg-soft">{s.summary}</p>
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                          <SkillDetail skill={s} />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  <OsBubble text={s.os} className="px-1" />
-                </motion.li>
-              )
-            })}
-          </AnimatePresence>
-        </motion.ul>
-      </LayoutGroup>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                )}
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* 桌面：右侧固定详情面板 */}
+        {wide && (
+          <aside className="sticky top-24">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current.id}
+                initial={{ opacity: 0, x: 14 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -14 }}
+                transition={{ duration: 0.18 }}
+              >
+                <SkillCard skill={current} />
+              </motion.div>
+            </AnimatePresence>
+          </aside>
+        )}
+      </div>
 
       <div className="mt-24">
         <div className="mb-8 flex flex-col gap-2">
@@ -118,6 +141,33 @@ export function Skills() {
         <TrainingList />
       </div>
     </section>
+  )
+}
+
+/** 选中技能的详情：像素条 + 实战说明 + 出处 + 心声 */
+function SkillCard({ skill }: { skill: Entry }) {
+  return (
+    <div className="card glow-box p-5">
+      <div className="mb-4 flex items-center gap-4">
+        <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-neon text-white shadow-[0_0_18px_rgb(255_45_85/0.7)]">
+          <Icon name={skill.icon} size={30} />
+        </span>
+        <div className="min-w-0">
+          <h3 className="text-lg font-bold text-fg">{skill.name}</h3>
+          <p className="font-mono text-xs text-fg-faint">
+            <span className="glow-text font-tiny text-[12px]">
+              {ui.skills.levelPrefix}
+              {skill.level}
+            </span>{' '}
+            / 10 · {skill.rank}
+          </p>
+        </div>
+      </div>
+      <SegmentBar key={skill.id} value={skill.level} />
+      <p className="mt-4 text-[15px] leading-7 text-fg">{skill.summary}</p>
+      <SkillDetail skill={skill} />
+      <OsBubble text={skill.os} />
+    </div>
   )
 }
 
@@ -157,7 +207,7 @@ function Advance() {
 
 function SkillDetail({ skill }: { skill: Entry }) {
   return (
-    <div className="space-y-4 border-t border-line px-4 pt-3.5 pb-4">
+    <div className="mt-4 space-y-4 border-t border-line pt-4">
       <div>
         <p className="mb-2 font-pixel text-[12px] leading-none text-neon-hi">{ui.skills.highlightsLabel}</p>
         <ul className="space-y-2">
@@ -182,42 +232,5 @@ function SkillDetail({ skill }: { skill: Entry }) {
         ))}
       </div>
     </div>
-  )
-}
-
-function FilterChip({
-  active,
-  onClick,
-  label,
-  count,
-  icon,
-}: {
-  active: boolean
-  onClick: () => void
-  label: string
-  count: number
-  icon?: Parameters<typeof Icon>[0]['name']
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={`relative flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-        active ? 'border-neon text-white' : 'border-line text-fg-soft hover:border-white/25 hover:text-fg'
-      }`}
-    >
-      {active && (
-        <motion.span
-          layoutId="skill-filter"
-          className="absolute inset-0 rounded-full bg-neon shadow-[0_0_16px_rgb(255_45_85/0.7)]"
-          transition={{ type: 'spring', stiffness: 480, damping: 34 }}
-        />
-      )}
-      {icon && <Icon name={icon} size={16} className="relative" />}
-      <span className="relative">{label}</span>
-      <span className={`relative font-mono text-xs ${active ? 'text-white/75' : 'text-fg-faint'}`}>{count}</span>
-    </button>
   )
 }
