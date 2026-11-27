@@ -1,26 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { CursorSparkle } from './components/fx/CursorSparkle'
 import { ParticleLayer } from './components/fx/ParticleLayer'
 import { burst, toast } from './components/fx/particles'
+import { TelepathyRipple } from './components/fx/TelepathyRipple'
 import { ToastHost } from './components/fx/ToastHost'
 import { Nav } from './components/layout/Nav'
-import { SkyBackground } from './components/layout/SkyBackground'
-import { About } from './components/sections/About'
 import { Contact } from './components/sections/Contact'
-import { Hero } from './components/sections/Hero'
-import { Log } from './components/sections/Log'
-import { Projects } from './components/sections/Projects'
+import { Cover } from './components/sections/Cover'
+import { Extra } from './components/sections/Extra'
+import { ProfileSection } from './components/sections/ProfileSection'
 import { Quests } from './components/sections/Quests'
 import { Skills } from './components/sections/Skills'
-import { Training } from './components/sections/Training'
+import { Works } from './components/sections/Works'
 import { profile } from './data/profile'
 import { useKonami } from './hooks/useKonami'
+import { TelepathyProvider } from './state/telepathy'
 
 export default function App() {
-  const [godMode, setGodMode] = useState(false)
-
   useEffect(() => {
-    // 直接打开 /#training 这类链接时，等组件挂载后再跳转到对应区块
+    // 直接打开 /#skills 这类链接时，等组件挂载后再跳转到对应章节
     if (location.hash) {
       const target = document.getElementById(decodeURIComponent(location.hash.slice(1)))
       requestAnimationFrame(() => target?.scrollIntoView())
@@ -29,40 +27,43 @@ export default function App() {
     document.documentElement.lang = profile.meta.lang
     document.querySelector('meta[name="description"]')?.setAttribute('content', profile.meta.description)
     console.log(
-      `%c▶ ${profile.ui.brand}%c\n${profile.ui.consoleGreeting}${profile.contact.email}`,
-      'font: 700 14px monospace; color: #4f7bf5; background: #edf2ff; padding: 4px 8px;',
-      'font: 12px sans-serif; color: #566078;',
+      `%c${profile.ui.stamp} ${profile.ui.brand}%c\n${profile.ui.consoleGreeting}${profile.contact.email}`,
+      'font: 700 14px monospace; color: #fff; background: #e0452b; padding: 4px 8px;',
+      'font: 12px sans-serif; color: #4d4741;',
     )
   }, [])
 
+  // 彩蛋：↑↑↓↓←→←→BA 触发「超能力暴走」
   useKonami(() => {
-    setGodMode(true)
-    toast(`${profile.ui.konami.title} · ${profile.ui.konami.text}`)
+    const root = document.documentElement
+    if (root.classList.contains('psychic')) return
+    root.classList.add('psychic')
+    window.setTimeout(() => root.classList.remove('psychic'), 2500)
+    toast(profile.ui.konami)
     const w = window.innerWidth
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 6; i++) {
       window.setTimeout(() => {
-        burst({ x: (w * (i + 0.5)) / 7, y: -10, count: 26, speed: 5, angle: Math.PI / 2, spread: Math.PI * 0.9, gravity: 0.12, life: 90, size: 6 })
-      }, i * 90)
+        burst({ x: (w * (i + 0.5)) / 6, y: window.innerHeight + 10, count: 18, speed: 6, angle: -Math.PI / 2, spread: Math.PI * 0.5, gravity: 0.1, life: 80, size: 6 })
+      }, i * 80)
     }
   })
 
   return (
-    <>
-      <SkyBackground />
+    <TelepathyProvider>
       <Nav />
       <main>
-        <Hero godMode={godMode} />
-        <About />
-        <Skills godMode={godMode} />
-        <Training />
+        <Cover />
+        <ProfileSection />
+        <Skills />
+        <Works />
         <Quests />
-        <Projects />
-        <Log />
+        <Extra />
         <Contact />
       </main>
+      <TelepathyRipple />
       <ParticleLayer />
       <CursorSparkle />
       <ToastHost />
-    </>
+    </TelepathyProvider>
   )
 }

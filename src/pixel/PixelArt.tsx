@@ -1,12 +1,11 @@
 import { memo, useMemo } from 'react'
-import { palette as defaultPalette } from './palette'
 
 interface PixelArtProps {
   /** 每行一个字符串，每个字符是一个像素，'.' 透明 */
   grid: readonly string[]
   /** 单个像素的显示尺寸（px） */
   scale?: number
-  palette?: Record<string, string>
+  palette: Record<string, string>
   className?: string
   title?: string
 }
@@ -15,7 +14,7 @@ interface PixelArtProps {
 export const PixelArt = memo(function PixelArt({
   grid,
   scale = 4,
-  palette = defaultPalette,
+  palette,
   className,
   title,
 }: PixelArtProps) {

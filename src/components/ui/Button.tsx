@@ -1,4 +1,3 @@
-import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import type { IconKey } from '../../pixel/icons'
 import { Icon } from './Icon'
@@ -14,42 +13,33 @@ interface ButtonProps {
   className?: string
 }
 
-/**
- * 游戏按钮：底部一条同色系「台阶」阴影，按下时下沉。
- * 阴影使用主题色而非纯黑，避免新粗野主义的硬黑阴影。
- */
+/** 漫画按钮：粗墨线 + 错位墨块，按下时贴合 */
 export function Button({ children, href, onClick, variant = 'primary', icon, download, external, className = '' }: ButtonProps) {
   const base =
-    'group inline-flex select-none items-center gap-2 rounded-xl px-4.5 py-2.5 text-[15px] font-semibold transition-[box-shadow,transform] duration-150 active:translate-y-[3px]'
-  const styles =
-    variant === 'primary'
-      ? 'bg-blue text-white shadow-[0_4px_0_var(--color-blue-strong)] hover:brightness-105 active:shadow-[0_1px_0_var(--color-blue-strong)]'
-      : 'border border-line-strong bg-white text-ink shadow-[0_4px_0_var(--color-line)] hover:border-blue-line hover:text-blue-strong active:shadow-[0_1px_0_var(--color-line)]'
+    'group inline-flex select-none items-center gap-2 border-[2.5px] border-ink px-4 py-2 text-[15px] font-semibold shadow-[4px_4px_0_var(--color-ink)] transition-[transform,box-shadow] duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0_var(--color-ink)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[1px_1px_0_var(--color-ink)]'
+  const styles = variant === 'primary' ? 'bg-red text-white' : 'bg-card text-ink'
   const content = (
     <>
-      {icon && <Icon name={icon} size={18} className="transition-transform duration-200 group-hover:-translate-y-0.5" />}
+      {icon && <Icon name={icon} size={18} />}
       {children}
     </>
   )
-  const motionProps = { whileHover: { y: -2 }, transition: { type: 'spring' as const, stiffness: 500, damping: 22 } }
-
   if (href) {
     return (
-      <motion.a
+      <a
         href={href}
         onClick={onClick}
         className={`${base} ${styles} ${className}`}
         {...(download ? { download: '' } : {})}
         {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
-        {...motionProps}
       >
         {content}
-      </motion.a>
+      </a>
     )
   }
   return (
-    <motion.button type="button" onClick={onClick} className={`${base} ${styles} ${className}`} {...motionProps}>
+    <button type="button" onClick={onClick} className={`${base} ${styles} ${className}`}>
       {content}
-    </motion.button>
+    </button>
   )
 }

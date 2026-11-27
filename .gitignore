@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 字体源文件（npm run fonts 自动下载）
+.font-src

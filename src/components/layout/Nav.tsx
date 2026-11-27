@@ -1,14 +1,12 @@
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { profile } from '../../data/profile'
-import type { SectionId } from '../../data/types'
 import { useActiveSection } from '../../hooks/useActiveSection'
-import { PixelArt } from '../../pixel/PixelArt'
-import { mascot } from '../../pixel/sprites'
-import { Icon } from '../ui/Icon'
+import { Stamp } from '../ui/Stamp'
+import { TelepathyToggle } from './TelepathyToggle'
 
 const { ui } = profile
-const ids = [...ui.nav.map((n) => n.id), 'contact'] as SectionId[]
+const ids = ui.nav.map((n) => n.id)
 
 export function Nav() {
   const active = useActiveSection(ids)
@@ -23,41 +21,35 @@ export function Nav() {
 
   return (
     <>
-      {/* 桌面：顶部悬浮游戏菜单 */}
-      <header className="no-print fixed inset-x-0 top-3 z-50 flex justify-center px-4">
-        <nav
-          className={`flex items-center gap-1 rounded-2xl border bg-white/80 p-1.5 backdrop-blur-md transition-[box-shadow,border-color] duration-300 ${
-            scrolled ? 'border-line shadow-[var(--shadow-soft)]' : 'border-transparent'
-          }`}
-          aria-label={ui.navAria.main}
-        >
-          <a href="#status" className="flex items-center gap-2 rounded-xl px-2.5 py-1.5 hover:bg-paper" aria-label={ui.brand}>
-            <PixelArt grid={mascot.idle.slice(0, 13)} scale={1.75} />
-            <span className="font-tiny text-[12px] tracking-wider text-ink">{ui.brand}</span>
+      <header
+        className={`no-print fixed inset-x-0 top-0 z-50 border-b-[2.5px] transition-colors duration-300 ${
+          scrolled ? 'border-ink bg-paper/95 backdrop-blur-sm' : 'border-transparent'
+        }`}
+      >
+        <nav className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-5" aria-label={ui.navAria.main}>
+          <a href="#cover" className="flex items-center gap-2.5" aria-label={ui.brand}>
+            <Stamp size={34} />
+            <span className="font-pixel text-[18px] leading-none tracking-wide text-ink">{ui.brand}</span>
           </a>
-          <span className="mx-1 hidden h-5 w-px bg-line lg:block" />
-          <ul className="hidden items-center lg:flex">
-            {ui.nav.map((item) => {
+          <ul className="ml-auto hidden items-center gap-0.5 lg:flex">
+            {ui.nav.slice(1).map((item) => {
               const isActive = active === item.id
               return (
                 <li key={item.id} className="relative">
                   <a
                     href={`#${item.id}`}
-                    title={item.sub}
                     aria-current={isActive ? 'true' : undefined}
-                    className={`relative z-10 flex items-center gap-1 rounded-xl px-3 py-2 font-tiny text-[11px] tracking-wider transition-colors ${
-                      isActive ? 'text-blue-strong' : 'text-ink-soft hover:text-ink'
+                    className={`relative z-10 flex items-baseline gap-1 px-3 py-2 font-pixel text-[12px] leading-none transition-colors ${
+                      isActive ? 'text-white' : 'text-ink-soft hover:text-ink'
                     }`}
                   >
-                    <span className={`text-[9px] ${isActive ? 'animate-blink' : 'opacity-0'}`} aria-hidden="true">
-                      ▶
-                    </span>
+                    <span className={`text-[12px] ${isActive ? 'text-white/80' : 'text-red'}`}>{item.no}</span>
                     {item.label}
                   </a>
                   {isActive && (
                     <motion.span
                       layoutId="nav-active"
-                      className="absolute inset-0 rounded-xl bg-blue-soft"
+                      className="absolute inset-0 bg-ink"
                       transition={{ type: 'spring', stiffness: 480, damping: 34 }}
                     />
                   )}
@@ -65,36 +57,30 @@ export function Nav() {
               )
             })}
           </ul>
-          <a
-            href="#contact"
-            className="ml-1 flex items-center gap-1.5 rounded-xl bg-blue px-3.5 py-2 text-sm font-semibold text-white shadow-[0_3px_0_var(--color-blue-strong)] transition-transform hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-[0_1px_0_var(--color-blue-strong)]"
-          >
-            <Icon name="mail" size={16} />
-            {ui.navCta}
-          </a>
+          <div className="ml-auto lg:ml-3">
+            <TelepathyToggle />
+          </div>
         </nav>
       </header>
 
-      {/* 移动端：底部 Tab */}
+      {/* 移动端：底部目录 */}
       <nav
-        className="no-print fixed inset-x-2 bottom-2 z-50 overflow-x-auto rounded-2xl border border-line bg-white/90 p-1 shadow-[var(--shadow-lift)] backdrop-blur-md lg:hidden"
+        className="no-print fixed inset-x-2 bottom-2 z-50 overflow-x-auto border-[2.5px] border-ink bg-paper/95 backdrop-blur-sm lg:hidden"
         aria-label={ui.navAria.mobile}
       >
         <ul className="flex min-w-max">
-          {ui.nav.map((item) => {
+          {ui.nav.slice(1).map((item) => {
             const isActive = active === item.id
             return (
               <li key={item.id} className="relative flex-1">
                 <a href={`#${item.id}`} className="relative z-10 flex flex-col items-center px-3 py-1.5">
-                  <span className={`font-tiny text-[10px] tracking-wider ${isActive ? 'text-blue-strong' : 'text-ink-faint'}`}>
-                    {item.label}
-                  </span>
-                  <span className={`text-[12px] ${isActive ? 'font-semibold text-ink' : 'text-ink-soft'}`}>{item.sub}</span>
+                  <span className={`font-pixel text-[12px] leading-none ${isActive ? 'text-white/80' : 'text-red'}`}>{item.no}</span>
+                  <span className={`mt-1 whitespace-nowrap font-pixel text-[12px] leading-none ${isActive ? 'text-white' : 'text-ink'}`}>{item.label}</span>
                 </a>
                 {isActive && (
                   <motion.span
                     layoutId="tab-active"
-                    className="absolute inset-0 rounded-xl bg-blue-soft"
+                    className="absolute inset-0 bg-ink"
                     transition={{ type: 'spring', stiffness: 480, damping: 34 }}
                   />
                 )}

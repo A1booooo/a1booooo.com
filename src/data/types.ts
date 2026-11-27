@@ -1,29 +1,24 @@
 import type { IconKey } from '../pixel/icons'
 
-/** 全站统一的点缀色。卡片描边、标签、进度条都从这里取色。 */
-export type Accent = 'blue' | 'mint' | 'amber' | 'lilac' | 'coral' | 'sky' | 'gray'
+/**
+ * 内心 OS：「心灵感应模式」打开时才显示的心声（第一人称，建议用全角括号包起来）。
+ * 写的时候守住底线：不吐槽前公司和同事，不贬低自己的能力——自嘲过程，不自嘲结果。
+ */
+export type Os = string
 
-export type SectionId =
-  | 'status'
-  | 'about'
-  | 'skills'
-  | 'training'
-  | 'quests'
-  | 'projects'
-  | 'log'
-  | 'contact'
+export type SectionId = 'cover' | 'profile' | 'skills' | 'works' | 'quests' | 'extra' | 'contact'
 
 export interface NavItem {
   id: SectionId
-  /** 像素字体显示的短英文标签，如 SKILLS */
+  /** 导航上的短名，如「人物设定」 */
   label: string
-  /** 中文小字说明 */
-  sub: string
+  /** 话数，如「1」「番外」 */
+  no: string
 }
 
 export interface SectionCopy {
-  /** 像素小标签，如 "02 · SKILLS" */
-  eyebrow: string
+  /** 话数标签，如「第 1 话」「番外篇」「最终话」 */
+  chapter: string
   title: string
   desc?: string
 }
@@ -34,84 +29,43 @@ export interface LinkItem {
   icon?: IconKey
 }
 
-/* ---------------- 角色 ---------------- */
-
-export interface ClassTag {
-  label: string
-  accent: Accent
-}
-
-/** 当前主职业 */
-export interface CharacterClass {
-  /** 短名，如「AI 前端」 */
-  label: string
-  /** 职业全称，如「AI 前端开发实习生」 */
-  title: string
-  /** 一句话介绍 */
-  summary: string
-  /** 主修标签 */
-  tags: ClassTag[]
-}
-
-/** 正在进阶的目标职业（转职任务） */
-export interface ClassAdvance {
-  /** 卡片小标题，如「转职任务」 */
-  title: string
-  /** 目标职业短名，如「AI 全栈」 */
-  label: string
-  /** 状态徽章，如「进阶中」 */
-  status: string
-  /** 0 - 100，渲染为分段进度条（不显示数字） */
-  progress: number
-  note: string
-  /** 进阶方向标签 */
-  tags: ClassTag[]
-  /** 标签组的小标题 */
-  tagsLabel: string
-  mainTagsLabel: string
-}
+/* ---------------- 主角 ---------------- */
 
 export interface Vital {
-  /** HP / MP / EXP 等 */
   key: string
   label: string
   value: number
   max: number
-  accent: Accent
   note: string
 }
 
-export interface Attribute {
-  label: string
+/** 转职进度：AI 前端 → AI 全栈 */
+export interface ClassAdvance {
+  from: string
+  to: string
   /** 0 - 100 */
-  value: number
+  progress: number
   note: string
-}
-
-export interface InfoRow {
-  icon: IconKey
-  label: string
-  value: string
-  /** 高亮为参考图那种蓝底信息条 */
-  highlight?: boolean
+  fromTags: string[]
+  toTags: string[]
+  os?: Os
 }
 
 export interface Character {
   name: string
   nameEn: string
-  level: string
-  levelNote: string
+  /** 封面副标题，如「AI 前端 → 进阶 AI 全栈」 */
+  role: string
+  /** 到岗状态（只在履历章和最终话出现） */
   status: string
-  mainClass: CharacterClass
-  advance: ClassAdvance
-  /** Hero 区的简历下载按钮，第一个为主按钮 */
-  resumes: LinkItem[]
   /** 打字机轮播的台词 */
   taglines: string[]
-  bio: string
+  /** 封面上的那句心声 */
+  coverOs: Os
+  /** 封面角落的「角色介绍栏」 */
   vitals: Vital[]
-  attributes: Attribute[]
-  infoRows: InfoRow[]
+  advance: ClassAdvance
+  resumes: LinkItem[]
 }
 
 /* ---------------- 技能 ---------------- */
@@ -124,19 +78,18 @@ export interface Skill {
   level: number
   /** 熟练度称号，如「熟练」 */
   rank: string
-  /** 一句话概括 */
   summary: string
-  /** 实战说明（悬停 / 点击时展示） */
+  /** 实战说明（展开后显示） */
   highlights: string[]
-  /** 关联的经历或项目名 */
+  /** 出处：关联的经历或项目名 */
   related: string[]
+  os?: Os
 }
 
 export interface SkillCategory {
   id: string
   label: string
   icon: IconKey
-  accent: Accent
   skills: Skill[]
 }
 
@@ -144,29 +97,34 @@ export interface TrainingSkill {
   id: string
   name: string
   icon: IconKey
-  accent: Accent
-  /** 0 - 100 的修炼进度（自行估算） */
+  /** 0 - 100 的修炼进度（自评估算） */
   progress: number
   startedAt: string
-  /** 当前阶段描述 */
   stage: string
   nextMilestone: string
   why: string
   resources: LinkItem[]
   log: { date: string; text: string }[]
+  os?: Os
 }
 
-/* ---------------- 档案 / 履历 / 项目 ---------------- */
+/* ---------------- 人物设定 ---------------- */
 
-export interface About {
-  paragraphs: string[]
-  principles: { icon: IconKey; title: string; text: string }[]
+export interface AboutInfo {
+  paragraphs: { text: string; os?: Os }[]
   facts: { label: string; value: string }[]
+  /** 做事的小执念 */
+  quirks: { icon: IconKey; title: string; text: string; os?: Os }[]
+  /** 域名由来 */
+  domain: { title: string; text: string; os?: Os }
 }
+
+/* ---------------- 履历 / 作品 ---------------- */
 
 export interface Achievement {
   title: string
   text: string
+  os?: Os
 }
 
 export interface Quest {
@@ -181,9 +139,6 @@ export interface Experience {
   org: string
   role: string
   period: string
-  location?: string
-  /** 'main' 主线任务 / 'side' 支线任务 */
-  kind: 'main' | 'side'
   quests: Quest[]
 }
 
@@ -195,11 +150,11 @@ export interface Project {
   tagline: string
   description: string
   icon: IconKey
-  accent: Accent
   metrics: { label: string; value: string }[]
   highlights: Achievement[]
   stack: string[]
   links: LinkItem[]
+  os?: Os
 }
 
 export interface Education {
@@ -213,9 +168,10 @@ export interface Award {
   title: string
   date: string
   icon: IconKey
+  os?: Os
 }
 
-/* ---------------- 兴趣 / 动态 / 联系 ---------------- */
+/* ---------------- 番外 / 联系 ---------------- */
 
 export type Rarity = 'common' | 'rare' | 'epic' | 'legendary'
 
@@ -225,12 +181,15 @@ export interface Hobby {
   icon: IconKey
   rarity: Rarity
   desc: string
+  /** 在第 1 话「人物设定」里作为「喜欢的东西」展示 */
+  favorite?: boolean
+  os?: Os
 }
 
 export interface Update {
   date: string
   version: string
-  kind: { label: string; accent: Accent }
+  kind: string
   title: string
   text: string
   link?: LinkItem
@@ -238,6 +197,7 @@ export interface Update {
 
 export interface Contact {
   blurb: string
+  os?: Os
   email: string
   links: LinkItem[]
 }
@@ -246,27 +206,43 @@ export interface Contact {
 
 export interface UiCopy {
   brand: string
+  /** 像素印章上的四个字，按印章习惯从右列往左列读 */
+  stamp: string
   nav: NavItem[]
-  /** 屏幕阅读器用的导航名称 */
   navAria: { main: string; mobile: string }
-  /** 导航右侧的行动按钮（跳到联系区） */
-  navCta: string
   sections: Record<SectionId, SectionCopy>
-  hero: {
+  telepathy: {
+    /** 开关上的名字 */
+    label: string
+    on: string
+    off: string
+    /** 屏幕阅读器用 */
+    aria: string
+    /** 切换时相棒说的话 */
+    onLine: string
+    offLine: string
+  }
+  cover: {
     hello: string
     vitalsTitle: string
-    attributesTitle: string
     scrollHint: string
+    tocLabel: string
+  }
+  profile: {
+    factsTitle: string
+    likesTitle: string
+    quirksTitle: string
   }
   skills: {
-    detailTitle: string
-    hoverHint: string
+    advanceTitle: string
+    allLabel: string
+    levelPrefix: string
     highlightsLabel: string
     relatedLabel: string
-    pinnedLabel: string
-    unpin: string
-    levelPrefix: string
-    allLabel: string
+    expand: string
+    collapse: string
+    trainingTitle: string
+    trainingDesc: string
   }
   training: {
     badge: string
@@ -281,26 +257,17 @@ export interface UiCopy {
     expand: string
     collapse: string
   }
-  about: {
-    principlesTitle: string
-    factsTitle: string
+  works: {
+    highlightsLabel: string
   }
   quests: {
-    mainQuest: string
-    sideQuest: string
     stackLabel: string
     educationTitle: string
     awardsTitle: string
     resumeTitle: string
   }
-  projects: {
-    roleLabel: string
-    stackLabel: string
-    highlightsLabel: string
-  }
-  log: {
+  extra: {
     inventoryTitle: string
-    inventoryDesc: string
     rarity: Record<Rarity, string>
     updatesTitle: string
     latest: string
@@ -310,16 +277,16 @@ export interface UiCopy {
     copied: string
     emailLabel: string
   }
-  mascot: {
+  aibo: {
     name: string
-    lines: string[]
     hint: string
+    /** 点击时轮流说的台词 */
+    lines: string[]
+    /** 连点 5 次掏出咖啡果冻时说的话 */
+    jellyLine: string
   }
-  konami: {
-    title: string
-    text: string
-  }
-  footer: string
+  konami: string
+  footer: string[]
   consoleGreeting: string
   backToTop: string
 }
@@ -336,7 +303,7 @@ export interface Profile {
   character: Character
   skillCategories: SkillCategory[]
   training: TrainingSkill[]
-  about: About
+  about: AboutInfo
   experience: Experience[]
   projects: Project[]
   education: Education[]
