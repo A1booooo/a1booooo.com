@@ -13,5 +13,5 @@ ProtectHome=yes
 PrivateTmp=yes
 NoNewPrivileges=yes
 UMask=0022
-TimeoutStartSec=200
+TimeoutStartSec=230
 ExecStart=/usr/local/libexec/mysite/pull-mysite.sh

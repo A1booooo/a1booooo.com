@@ -6,8 +6,13 @@ releases=/www/wwwroot/mysite-releases
 archive_base=https://codeload.github.com/A1booooo/a1booooo.com/tar.gz
 current="$releases/current"
 
-published_ref="$(timeout 20s git ls-remote --exit-code "$remote" refs/heads/mysite-production)"
-publication="${published_ref%%$'\t'*}"
+if published_ref="$(timeout 25s git -c http.version=HTTP/1.1 ls-remote --exit-code "$remote" refs/heads/mysite-production)"; then
+    publication="${published_ref%%$'\t'*}"
+else
+    publication="$(curl --fail --silent --show-error --connect-timeout 8 --max-time 15 \
+        https://api.github.com/repos/A1booooo/a1booooo.com/git/ref/heads/mysite-production |
+        python3 -c 'import json, sys; print(json.load(sys.stdin)["object"]["sha"])')"
+fi
 [[ "$publication" =~ ^[0-9a-f]{40}$ ]]
 old_release="$(readlink "$current")"
 if [[ "$old_release" == "$publication" ]]; then
@@ -43,19 +48,23 @@ if [[ ! -d "$release" ]]; then
 fi
 
 move_link() {
-    ln -s "$2" "$workspace/link"
-    mv -Tf "$workspace/link" "$releases/$1"
+    ln -s "$2" "$workspace/$1-next" && mv -Tf "$workspace/$1-next" "$releases/$1"
 }
 
 revision="$(cat "$release/revision.txt")"
 curl_site=(curl --noproxy '*' --fail --silent --show-error --max-time 8
     --resolve a1booooo.com:443:127.0.0.1)
+old_previous="$(readlink "$releases/previous")"
 move_link previous "$old_release"
-move_link current "$publication"
+if ! move_link current "$publication"; then
+    move_link previous "$old_previous"
+    exit 1
+fi
 if ! "${curl_site[@]}" https://a1booooo.com/ -o "$workspace/index.html" ||
     ! cmp -s "$workspace/index.html" "$release/index.html" ||
     [[ "$("${curl_site[@]}" https://a1booooo.com/revision.txt)" != "$revision" ]]; then
     move_link current "$old_release"
+    move_link previous "$old_previous"
     echo "HTTPS check failed. Restored $old_release." >&2
     exit 1
 fi
